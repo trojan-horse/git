@@ -1,0 +1,44 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Active Listings</h2>
+
+    <div class="row row-cols-1 row-cols-md-3">
+
+    {% for stuff in idk %}
+        {% if stuff.active == True %}
+        <div class="col mb-4">
+        <div class="card h-100">
+            <img src="{{ stuff.image }}" class="card-img-top" style="object-fit: cover; max-height:200px;display:block">
+            <div class="card-body">
+                <h4 class="card-title">{{ stuff.title }} <span class="badge badge-info" style="float:right">{{ stuff.category }}</span></h4>
+                <p class="class-text">{{ stuff.description }}</p>
+                <small class="text-muted">{{ stuff.user }}</small>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h5>${{ stuff.current_price }}</h5></li></h5>
+            </ul>
+            <div class="card-footer">
+                <a href="{% url 'listing' stuff.id %}" class="btn btn-primary">Check it out!</a>
+                {% if empty == False %}
+                {% for bid in bids %}
+                {% if bid.listing.id == stuff.id and bid.bid >= stuff.current_price %}
+                <small class="text-muted" style="float:right">Latest bid by {{ bid.owner }} <br> on {{bid.latest_bid_time}}</small>
+                {% else %}
+                {% endif %}
+                {% endfor %}
+                {% else %}
+                <small class="text-muted" style="float:right">Created by {{ stuff.user }} <br> on {{stuff.date_created}}</small>
+                {% endif %}
+            </div>
+            </div>
+        </div>
+        {% endif %}
+
+
+        {% endfor %}
+
+    </div>
+
+
+{% endblock %}

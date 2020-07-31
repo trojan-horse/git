@@ -1,0 +1,87 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+<div class="container-fluid">
+    <h2>{{ detail.title }}</h2>
+    <div class="row">
+        <div class="col">
+            <img src="{{ detail.image }}" class="rounded-sm" style="max-width:400px">
+        </div>
+        <div class="col">
+            <h4><span class="badge badge-info">{{ detail.category }}</span></h4>
+            <br>
+            <h4>${{ current_price }}</h4>
+            {{ detail.description }}
+        <br>
+            <br>
+            <small class="text-muted">Created {{ detail.date_created }} by {{ detail.user }}</small>
+        <br>
+            <br>
+        </div>
+    </div>
+        <div class="row">
+            <div class="col"></div>
+            <div class="col">
+            {% if user.is_authenticated %}
+            {% if detail.active == True %}
+                {{ number_of_bids }} bid(s) so far.
+                {% if winner.owner == user %}
+                Your bid is the current bid.
+                {% endif %}
+            <form action="{% url 'listing' listing_id %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="formOne">
+
+                {% if detail.user == user %}
+                <input type="submit" name="close" class="btn btn-primary btn-sm" value="Close Auction">
+                {% else %}
+                <input type="number" name="bid" placeholder="Bid">
+                <input type="submit" class="btn btn-primary btn-sm" value="Place Bid">
+                {% if in_wl == False %}
+                <input type="submit" name="save" class="btn btn-primary btn-sm" value="Save to watchlist">
+                {% else %}
+                <input type="submit" name="remove" class="btn btn-danger btn-sm" value="Remove from watchlist">
+                {% endif %}
+                {% if message %}
+                {{ message }}
+                {% endif %}
+                {% endif %}
+                </form>
+                {% else %}
+                This auction is closed.
+                <br>
+                {% if winner.owner == user %}
+                Congratulations! You won the auction!
+                {% else %}
+                Won by {{ winner.owner }} on {{ winner.latest_bid_time }}
+                {% endif %}
+                {% endif %}
+                {% endif %}
+            </div>
+            </div>
+        </div>
+
+
+<hr>
+<h3>Comments</h3>
+<ul class="list-group list-group-flush">
+{% for comment in comments %}
+    <li class="list-group-item list-group-item-light"> <h6><span class="badge badge-secondary">{{ comment.user }}</span></h6>
+    {{ comment.comment }} <small class="text-muted" style="float: right">{{ comment.time }}</small> </li>
+{% endfor %}
+</ul>
+<br>
+{% if user.is_authenticated %}
+<form action="{% url 'listing' listing_id %}" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="form_type" value="comment">
+    <textarea type="text" name="comment" placeholder="Add comment here" cols=100></textarea>
+    <br>
+    <input type="submit" class="btn btn-secondary" value="Save">
+</form>
+{% else %}
+Sign in to comment.
+{% endif %}
+
+{% endblock %}
